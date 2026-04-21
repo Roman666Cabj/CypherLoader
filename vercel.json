@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "https://cypher-spectre--romanff1711.replit.app/$1"
+    }
+  ]
+}
