@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "https://cypher-spectre--romanff1711.replit.app/$1"
+      "destination": "https://cyprot-internal-storage--RomanAlplax.replit.app/$1"
     }
   ]
 }
