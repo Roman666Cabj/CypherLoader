@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "https://cyprot-internal-storage--romanalplax.replit.app/$1"
+      "destination": "https://internal-script-manager--brainrotsnose34.replit.app/$1"
     }
   ]
 }
