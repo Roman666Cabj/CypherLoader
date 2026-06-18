@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "https://cyprot-internal-storage--RomanAlplax.replit.app/$1"
+      "destination": "https://cyprot-shell--metodobeam2.replit.app//$1"
     }
   ]
 }
