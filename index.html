@@ -1,0 +1,324 @@
+<!doctype html>
+
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>666 Obfuscator</title>
+  <style>
+    :root{
+      --bg:#090303;
+      --panel:rgba(18,6,6,.78);
+      --panel2:rgba(35,10,10,.72);
+      --line:rgba(255,80,50,.22);
+      --red:#ff3b1f;
+      --red2:#ff6a3d;
+      --text:#ffe9e4;
+      --muted:#d7a39a;
+      --ok:#ff8c5a;
+      --shadow:0 18px 70px rgba(0,0,0,.5);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,68,24,.16), transparent 18%),
+        radial-gradient(circle at 80% 15%, rgba(255,86,26,.12), transparent 16%),
+        radial-gradient(circle at 50% 100%, rgba(255,60,0,.16), transparent 20%),
+        linear-gradient(180deg, #120404 0%, #070202 100%);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    body::before, body::after{
+      content:"";
+      position:fixed; inset:-20%; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,83,18,.18) 0 3px, transparent 4px),
+        radial-gradient(circle at 70% 40%, rgba(255,135,90,.14) 0 2px, transparent 3px),
+        radial-gradient(circle at 50% 60%, rgba(255,72,0,.12) 0 4px, transparent 5px);
+      filter:blur(10px);
+      animation: drift 14s linear infinite;
+      opacity:.75;
+    }
+    body::after{
+      background:
+        linear-gradient(180deg, transparent 0 70%, rgba(255,75,25,.17) 82%, rgba(255,25,10,.28) 100%),
+        repeating-linear-gradient(115deg, transparent 0 10px, rgba(255,95,30,.05) 10px 16px);
+      animation: lavaFlow 10s linear infinite;
+      mix-blend-mode:screen;
+      opacity:.55;
+    }
+    @keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(3%,2%,0) scale(1.06)}}
+    @keyframes lavaFlow{from{transform:translateY(-5%)}to{transform:translateY(5%)}}
+    .wrap{position:relative; z-index:1; min-height:100%; padding:24px; display:grid; place-items:center}
+    .card{
+      width:min(980px,100%);
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(30,10,10,.88), rgba(10,4,4,.94));
+      box-shadow:var(--shadow);
+      border-radius:24px;
+      overflow:hidden;
+      position:relative;
+      backdrop-filter: blur(14px);
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:0;
+      background:linear-gradient(135deg, rgba(255,72,0,.14), transparent 35%, transparent 65%, rgba(255,72,0,.08));
+      pointer-events:none;
+    }
+    .header{
+      padding:22px 24px 18px;
+      border-bottom:1px solid rgba(255,90,40,.16);
+      display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;
+      background:linear-gradient(180deg, rgba(255,45,0,.08), transparent);
+    }
+    .brand{display:flex; flex-direction:column; gap:6px}
+    .brand h1{margin:0; font-size:clamp(28px,4vw,42px); letter-spacing:.08em; text-transform:uppercase}
+    .brand h1 span{color:var(--red)}
+    .brand p{margin:0; color:var(--muted); font-size:14px}
+    .chips{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .chip{
+      border:1px solid rgba(255,90,40,.2);
+      background:rgba(255,40,10,.08);
+      color:#ffd7cf;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      letter-spacing:.03em;
+      box-shadow:0 0 0 1px rgba(255,75,20,.04) inset;
+    }
+    .chip strong{color:#fff}
+    .content{padding:22px; display:grid; gap:16px; grid-template-columns:1.1fr .9fr}
+    @media (max-width: 860px){.content{grid-template-columns:1fr}}
+    .panel{
+      border:1px solid rgba(255,90,40,.14);
+      background:linear-gradient(180deg, var(--panel), rgba(10,4,4,.74));
+      border-radius:20px;
+      padding:16px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+      position:relative;
+    }
+    .panel h2{margin:0 0 12px; font-size:16px; letter-spacing:.06em; text-transform:uppercase}
+    label{display:block; font-size:12px; color:var(--muted); margin:0 0 8px}
+    textarea, input{
+      width:100%;
+      border-radius:16px;
+      border:1px solid rgba(255,110,60,.16);
+      background:rgba(0,0,0,.28);
+      color:var(--text);
+      padding:14px;
+      outline:none;
+      transition:.2s ease;
+      font:inherit;
+    }
+    textarea{min-height:320px; resize:vertical; line-height:1.45}
+    textarea:focus, input:focus{border-color:rgba(255,105,58,.5); box-shadow:0 0 0 4px rgba(255,75,20,.12)}
+    .row{display:grid; gap:12px}
+    .fixed{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .fixed .box{
+      border-radius:16px;
+      padding:12px 14px;
+      border:1px solid rgba(255,90,40,.15);
+      background:rgba(255,35,10,.07);
+    }
+    .fixed .box b{display:block; color:#fff; margin-top:4px}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    button{
+      appearance:none;
+      border:0;
+      border-radius:14px;
+      padding:12px 16px;
+      font:inherit;
+      cursor:pointer;
+      transition:.2s ease;
+      color:#fff;
+      background:linear-gradient(180deg, #ff4a28, #b31300);
+      box-shadow:0 10px 30px rgba(255,65,20,.18);
+    }
+    button.secondary{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,90,40,.18);
+      box-shadow:none;
+      color:#ffd8cf;
+    }
+    button:hover{transform:translateY(-1px); filter:brightness(1.05)}
+    button:disabled{opacity:.65; cursor:not-allowed; transform:none}
+    .status{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--muted);
+      min-height:1.2em;
+    }
+    .status.ok{color:#ffb08c}
+    pre{
+      margin:0;
+      min-height:320px;
+      max-height:520px;
+      overflow:auto;
+      white-space:pre-wrap;
+      word-break:break-word;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(255,90,40,.14);
+      background:rgba(0,0,0,.26);
+      color:#ffe7e2;
+      line-height:1.45;
+    }
+    .footer{
+      padding:0 22px 22px;
+      color:rgba(255,220,214,.58);
+      font-size:12px;
+    }
+    .glow{
+      position:absolute; inset:auto -20% -18% -20%; height:220px; pointer-events:none;
+      background:radial-gradient(circle, rgba(255,87,26,.24), rgba(255,48,0,.1) 36%, transparent 72%);
+      filter:blur(30px);
+      animation:pulse 4.5s ease-in-out infinite;
+    }
+    @keyframes pulse{50%{transform:scale(1.08); opacity:.85}}
+    .ember{
+      position:fixed; inset:auto 0 0 0; height:100%; pointer-events:none; z-index:0;
+      background-image:
+        radial-gradient(circle at 10% 90%, rgba(255,110,60,.75) 0 1px, transparent 2px),
+        radial-gradient(circle at 25% 85%, rgba(255,170,90,.55) 0 1px, transparent 2px),
+        radial-gradient(circle at 40% 95%, rgba(255,95,40,.7) 0 1px, transparent 2px),
+        radial-gradient(circle at 65% 88%, rgba(255,130,70,.65) 0 1px, transparent 2px),
+        radial-gradient(circle at 80% 92%, rgba(255,95,40,.7) 0 1px, transparent 2px),
+        radial-gradient(circle at 92% 86%, rgba(255,165,95,.5) 0 1px, transparent 2px);
+      background-size: 180px 220px;
+      animation: embers 7s linear infinite;
+      opacity:.75;
+      filter: blur(.2px);
+    }
+    @keyframes embers{from{transform:translateY(0)}to{transform:translateY(-220px)}}
+    .tiny{opacity:.85; font-size:11px; color:#ffbcae}
+    code.inline{background:rgba(255,255,255,.05); padding:2px 7px; border-radius:999px; border:1px solid rgba(255,100,50,.15)}
+  </style>
+</head>
+<body>
+  <div class="ember"></div>
+  <div class="wrap">
+    <main class="card">
+      <div class="glow"></div>
+      <header class="header">
+        <div class="brand">
+          <h1><span>666</span> Obfuscator</h1>
+          <p>Cypher API client con estética infernal, lava y acento rojo.</p>
+        </div>
+        <div class="chips">
+          <div class="chip"><strong>Preset:</strong> Full VM</div>
+          <div class="chip"><strong>AntiTamper:</strong> true</div>
+          <div class="chip"><strong>Engine:</strong> Cypher</div>
+        </div>
+      </header><section class="content">
+    <div class="panel">
+      <h2>Input</h2>
+      <div class="fixed">
+        <div class="box"><span class="tiny">Preset fijo</span><b>Full VM</b></div>
+        <div class="box"><span class="tiny">AntiTamper fijo</span><b>true</b></div>
+      </div>
+      <label for="script">Luau script</label>
+      <textarea id="script" spellcheck="false" placeholder="print('hola mundo')"></textarea>
+      <div class="actions">
+        <button id="healthBtn" class="secondary">Check health</button>
+        <button id="obfuscateBtn">Obfuscate</button>
+      </div>
+      <div id="status" class="status">Listo.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Output</h2>
+      <label>Respuesta</label>
+      <pre id="output">-- waiting...</pre>
+    </div>
+  </section>
+
+  <div class="footer">
+    Endpoint: <code class="inline">https://cypher-obfuscator-production.up.railway.app/api/obfuscate</code>
+  </div>
+</main>
+
+  </div>  <script>
+    const API_BASE = 'https://cypher-obfuscator-production.up.railway.app';
+    const scriptEl = document.getElementById('script');
+    const outputEl = document.getElementById('output');
+    const statusEl = document.getElementById('status');
+    const healthBtn = document.getElementById('healthBtn');
+    const obfuscateBtn = document.getElementById('obfuscateBtn');
+
+    scriptEl.value = `local x = 42\nprint(x)`;
+
+    function setStatus(msg, ok = false) {
+      statusEl.textContent = msg;
+      statusEl.className = ok ? 'status ok' : 'status';
+    }
+
+    async function checkHealth() {
+      try {
+        healthBtn.disabled = true;
+        setStatus('Consultando health...');
+        const res = await fetch(`${API_BASE}/api/health`, {
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || `HTTP ${res.status}`);
+        outputEl.textContent = JSON.stringify(data, null, 2);
+        setStatus(`Engine lista: ${data.engine || 'Cypher'}`, true);
+      } catch (err) {
+        outputEl.textContent = String(err);
+        setStatus('Health falló.');
+      } finally {
+        healthBtn.disabled = false;
+      }
+    }
+
+    async function obfuscate() {
+      const script = scriptEl.value.trim();
+      if (!script) {
+        setStatus('Pegá un script primero.');
+        return;
+      }
+
+      try {
+        obfuscateBtn.disabled = true;
+        setStatus('Obfuscando con Full VM + antiTamper...');
+        outputEl.textContent = 'Working...';
+
+        const res = await fetch(`${API_BASE}/api/obfuscate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            script,
+            preset: 'Full VM',
+            antiTamper: true,
+            clientSource: 'page'
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.status !== 'ok') {
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+
+        outputEl.textContent = data.obfuscated || '-- empty response --';
+        setStatus(`OK · Preset ${data?.meta?.preset || 'Full VM'} · ${data?.meta?.originalLines ?? '?'} líneas`, true);
+      } catch (err) {
+        outputEl.textContent = `Error: ${err.message || err}`;
+        setStatus('Obfuscation falló.');
+      } finally {
+        obfuscateBtn.disabled = false;
+      }
+    }
+
+    healthBtn.addEventListener('click', checkHealth);
+    obfuscateBtn.addEventListener('click', obfuscate);
+  </script></body>
+</html>
